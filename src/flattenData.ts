@@ -13,8 +13,14 @@ export function flattenData(contents: string): string {
 
     let result = "";
     const last: Person = { firstName: "", lastName: "" };
-    for (const line of data) {
-        const rgx = new RegExp(/(\w+),\s+(\w+)\s+(\d+)/gm);
+    for (let line of data) {
+        if (!line) continue;
+
+        if (line.endsWith("\n")) {
+            line = pop(line);
+        }
+
+        const rgx = new RegExp(/(.*),\s+(.*)\s+(\d+)/gm);
         const lineData = rgx.exec(line);
         if (!lineData) {
             throw new Error(`Possible invalid line format: '${line}'`);
@@ -24,10 +30,14 @@ export function flattenData(contents: string): string {
         const isDup = last.firstName === firstName && last.lastName === lastName;
 
         if (isDup) {
+            if (result.endsWith("\r") || result.endsWith("\n")) {
+                result = pop(result);
+            }
+
             result += `, ${pageNumber}`;
         } else {
-            const prependNL = result !== "" && !result.endsWith("\n");
-            result += `${prependNL ? "\n" : ""}${line}`;
+            const prependCR = result !== "" && !result.endsWith("\r");
+            result += `${prependCR ? "\r" : ""}${line}`;
         }
 
         last.firstName = firstName;
@@ -35,4 +45,8 @@ export function flattenData(contents: string): string {
     }
 
     return result;
+}
+
+function pop(s: string) {
+    return s.slice(0, s.length - 1);
 }
