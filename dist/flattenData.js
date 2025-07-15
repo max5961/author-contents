@@ -7,19 +7,24 @@
  * John, Smith  587, 373
  */
 export function flattenData(contents) {
-    const data = contents.split("\n");
+    const lines = getLines(contents);
+    const errors = [];
     let result = "";
+    let lineNum = 0;
     const last = { firstName: "", lastName: "" };
-    for (let line of data) {
-        if (!line)
+    for (let line of lines) {
+        // In case file contents contains anything like "\n\r" or "\r\r"
+        if (!line || line === "\r" || line === "\n")
             continue;
-        if (line.endsWith("\n")) {
+        ++lineNum;
+        if (line.endsWith("\r")) {
             line = pop(line);
         }
         const rgx = new RegExp(/(.*),\s+(.*)\s+(\d+)/gm);
         const lineData = rgx.exec(line);
         if (!lineData) {
-            throw new Error(`Possible invalid line format: '${line}'`);
+            errors.push(`Possible invalid line format on line ${lineNum}: '${line}'`);
+            continue;
         }
         const [firstName, lastName, pageNumber] = lineData.slice(1);
         const isDup = last.firstName === firstName && last.lastName === lastName;
@@ -36,9 +41,16 @@ export function flattenData(contents) {
         last.firstName = firstName;
         last.lastName = lastName;
     }
-    return result;
+    return { result, errors };
 }
 function pop(s) {
     return s.slice(0, s.length - 1);
+}
+/**
+ * In case file contains \n instead of \r
+ */
+function getLines(contents) {
+    const data = contents.replace(/\n/gm, "\r");
+    return data.split("\r");
 }
 //# sourceMappingURL=flattenData.js.map

@@ -8,6 +8,11 @@ const resultFile = process.argv[3] ?? `sanitized-${randomUUID().split("-")[0]}.t
 if (!unsanitizedFilePath) throw new Error("Provide a file path argument");
 
 const contents = fs.readFileSync(unsanitizedFilePath, "utf-8");
-const results = flattenData(contents);
-fs.writeFileSync(resultFile, results, "utf-8");
-console.log(`Results written to: ${resultFile}`);
+const { result, errors } = flattenData(contents);
+fs.writeFileSync(resultFile, result, "utf-8");
+
+if (errors) {
+    errors.forEach(console.log);
+}
+
+console.log(`\nResults written to: ${resultFile}`);

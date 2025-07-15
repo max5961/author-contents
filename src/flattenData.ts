@@ -8,22 +8,28 @@ type Person = { firstName: string; lastName: string };
  * To:
  * John, Smith  587, 373
  */
-export function flattenData(contents: string): string {
-    const data = contents.split("\n");
+export function flattenData(contents: string): { result: string; errors: string[] } {
+    const lines = getLines(contents);
+    const errors = [] as string[];
 
     let result = "";
+    let lineNum = 0;
     const last: Person = { firstName: "", lastName: "" };
-    for (let line of data) {
-        if (!line) continue;
+    for (let line of lines) {
+        // In case file contents contains anything like "\n\r" or "\r\r"
+        if (!line || line === "\r" || line === "\n") continue;
+        ++lineNum;
 
-        if (line.endsWith("\n")) {
+        if (line.endsWith("\r")) {
             line = pop(line);
         }
 
         const rgx = new RegExp(/(.*),\s+(.*)\s+(\d+)/gm);
         const lineData = rgx.exec(line);
+
         if (!lineData) {
-            throw new Error(`Possible invalid line format: '${line}'`);
+            errors.push(`Possible invalid line format on line ${lineNum}: '${line}'`);
+            continue;
         }
 
         const [firstName, lastName, pageNumber] = lineData.slice(1);
@@ -44,9 +50,17 @@ export function flattenData(contents: string): string {
         last.lastName = lastName;
     }
 
-    return result;
+    return { result, errors };
 }
 
 function pop(s: string) {
     return s.slice(0, s.length - 1);
+}
+
+/**
+ * In case file contains \n instead of \r
+ */
+function getLines(contents: string) {
+    const data = contents.replace(/\n/gm, "\r");
+    return data.split("\r");
 }

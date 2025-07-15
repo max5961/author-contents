@@ -6,4 +6,7 @@
  * To:
  * John, Smith  587, 373
  */
-export declare function flattenData(contents: string): string;
+export declare function flattenData(contents: string): {
+    result: string;
+    errors: string[];
+};
