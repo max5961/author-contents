@@ -12,7 +12,7 @@ const { result, errors } = flattenData(contents);
 fs.writeFileSync(resultFile, result, "utf-8");
 
 if (errors) {
-    errors.forEach(console.log);
+    errors.forEach((err) => console.log(err));
 }
 
 console.log(`\nResults written to: ${resultFile}`);
