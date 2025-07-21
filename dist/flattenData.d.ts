@@ -10,3 +10,7 @@ export declare function flattenData(contents: string): {
     result: string;
     errors: string[];
 };
+/**
+ * In case file contains \n instead of \r
+ */
+export declare function getLines(contents: string): string[];

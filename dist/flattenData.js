@@ -23,7 +23,8 @@ export function flattenData(contents) {
         const rgx = new RegExp(/(.*),\s+(.*)\s+(\d+)/gm);
         const lineData = rgx.exec(line);
         if (!lineData) {
-            errors.push(`Possible invalid line format on line ${lineNum}: '${line}'`);
+            errors.push(`Possible invalid line format on line ${lineNum}: '${line}'.  Line pushed as is.`);
+            result += `\r${line}\r`;
             continue;
         }
         const [firstName, lastName, pageNumber] = lineData.slice(1);
@@ -49,7 +50,7 @@ function pop(s) {
 /**
  * In case file contains \n instead of \r
  */
-function getLines(contents) {
+export function getLines(contents) {
     const data = contents.replace(/\n/gm, "\r");
     return data.split("\r");
 }

@@ -28,7 +28,10 @@ export function flattenData(contents: string): { result: string; errors: string[
         const lineData = rgx.exec(line);
 
         if (!lineData) {
-            errors.push(`Possible invalid line format on line ${lineNum}: '${line}'`);
+            errors.push(
+                `Possible invalid line format on line ${lineNum}: '${line}'.  Line pushed as is.`,
+            );
+            result += `\r${line}\r`;
             continue;
         }
 
@@ -60,7 +63,7 @@ function pop(s: string) {
 /**
  * In case file contains \n instead of \r
  */
-function getLines(contents: string) {
+export function getLines(contents: string) {
     const data = contents.replace(/\n/gm, "\r");
     return data.split("\r");
 }
